@@ -1,0 +1,60 @@
+---
+title: "coffee_data"
+author: "Jake Schefrin"
+date: "7/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("pacman")
+
+p_load(tidytuesdayR, tidyverse)
+
+theme_set(theme_light())
+coffee_ratings <- tt_load("2020-07-07")$coffee_ratings
+
+
+```
+
+```{r}
+
+view(coffee_ratings)
+
+coffee_ratings %>% 
+  count(species, sort = TRUE)
+
+coffee_lumped <- coffee_ratings %>% 
+  filter(!is.na(variety),
+         total_cup_points > 10) %>% 
+  mutate(variety = fct_lump(variety, 12), sort = TRUE) 
+
+coffee_lumped %>%
+  mutate(variety = fct_reorder(variety, total_cup_points)) %>% 
+  ggplot(aes(total_cup_points, variety)) +
+  geom_boxplot()
+
+coffee_lumped %>% 
+  ggplot(aes(total_cup_points, fill = variety)) +
+  geom_histogram(binwidth = 2) + 
+  facet_wrap(~ variety, scale = "free_y") + 
+  theme(legend.position = "none")
+```
+
+```{r}
+coffee_ratings %>% 
+  summarize(across(everything()), ~ mean(!is.na(.)))
+
+coffee_ratings %>% 
+  count(producer, sort = TRUE)
+
+```
+coffee_ratings %>%
+  mutate(coffee_id = row_number()) %>% 
+  select(total_cup_points, species, owner, farm_name, ico_number, country_of_origin, 
+         aroma, moisture)
+
+```
